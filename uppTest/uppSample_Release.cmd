@@ -1,0 +1,2 @@
+-l"ti\pspiom\platforms\evm6748\lib\Release\ti.pspiom.platforms.evm6748.evmInit.a674"
+-l"ti\pspiom\upp\lib\C6748\Release\ti.pspiom.upp.a674"

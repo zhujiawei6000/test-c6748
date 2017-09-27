@@ -1,0 +1,3 @@
+js: "D:/Users/zhuji/Projects/CCD/SY18-201708/DSP/gpioTest/app.cfg", line 58: xdc.services.global.XDCException: xdc.PACKAGE_NOT_FOUND: can't locate the package 'ti.osal' along the path: 'D:/ti/bios_6_46_05_55/packages;D:/ti/ccsv7/ccs_base;D:/ti/xdctools_3_32_02_25_core/packages;..;'. Ensure that the package path is set correctly.
+    "./package/cfg/app_pe674.cfg", line 187
+gmake.exe: *** [package/cfg/app_pe674.xdl] Error 1

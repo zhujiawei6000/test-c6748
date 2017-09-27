@@ -1,0 +1,1 @@
+"./GPIO_board.obj" "./main_led_blink.obj" -l"configPkg/linker.cmd" -llibc.a 
