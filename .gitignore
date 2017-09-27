@@ -24,9 +24,9 @@
 
 .xdchelp
 sysbios.ae674
-DSP/.metadata
-DSP/*/Debug
-DSP/*/Release
-DSP/*/.launches
-DSP/*/.config
+.metadata
+*/Debug
+*/Release
+*/.launches
+*/.config
 
