@@ -34,7 +34,8 @@
 /* Board Header files */
 #include <ti/board/board.h>
 #define I2C_INSTANCE_NUM        1
-#define I2C_SLAVE_ADDR         1
+#define I2C_OWN_SLAVE_ADDR      0x20
+#define I2C_SLAVE_ADDR          0x30
 /*
  *  ======== I2C init config ========
  */
@@ -48,7 +49,7 @@ static void I2C_initConfig(uint32_t instance)
     /* interrupt enabled */
     i2c_cfg.enableIntr = true;
 
-    i2c_cfg.ownSlaveAddr = I2C_SLAVE_ADDR;
+    i2c_cfg.ownSlaveAddr = I2C_OWN_SLAVE_ADDR;
 
     /* Set the I2C init configurations */
     I2C_socSetInitCfg(instance, &i2c_cfg);
@@ -135,8 +136,13 @@ Void masterTaskFxn (UArg arg0, UArg arg1)
 
     I2C_initConfig(I2C_INSTANCE_NUM);
 
+    int i = 0;
     while (1) {
-        FPGA_WriteReg(1, 2);
+        uint8_t address = i % 5;
+        uint32_t value = i % 20;
+        i++;
+        UART_printf("FPGA WriteReg [%u] = [%u]\n", address, value);
+        FPGA_WriteReg(address, value);
         Task_sleep(1000);
     }
 
@@ -146,6 +152,7 @@ Void masterTaskFxn (UArg arg0, UArg arg1)
  *  ======== main ========
  */
 Int main()
+
 { 
 
     System_printf("enter main()\n");

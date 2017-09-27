@@ -24,9 +24,9 @@
 
 .xdchelp
 sysbios.ae674
+makefile.libs
 .metadata
 */Debug
 */Release
 */.launches
 */.config
-
