@@ -81,7 +81,7 @@ static bool I2C_Write(I2C_Handle i2c,void* buf, int size) {
     I2C_transactionInit(&transaction);
     transaction.writeCount = size;
     transaction.readCount  = 0;
-    transaction.timeout    = 1000;
+    transaction.timeout    = 1;
     transaction.expandSA = false;
     transaction.masterMode   = true;
     transaction.slaveAddress = I2C_SLAVE_ADDR;
@@ -113,21 +113,34 @@ static void FPGA_WriteReg(uint8_t address, uint32_t value) {
 }
 static uint32_t FPGA_ReadReg(uint8_t address) {
     I2C_Params        i2cParams;
-    /* Initialize I2C handle */
-    I2C_Params_init(&i2cParams);
-    i2cParams.transferMode = I2C_MODE_BLOCKING;
-    i2cParams.bitRate = I2C_100kHz;
-    I2C_Handle i2c = I2C_open(I2C_INSTANCE_NUM, &i2cParams);
-    if (i2c == NULL)
-    {
-        return 0;
-    }
-    I2C_Write(i2c, &address, 1);
-    uint32_t rxBuf;
-    I2C_Read(i2c, &rxBuf, sizeof(rxBuf));
+     /* Initialize I2C handle */
+     I2C_Params_init(&i2cParams);
+     i2cParams.transferMode = I2C_MODE_BLOCKING;
+     i2cParams.bitRate = I2C_100kHz;
+     I2C_Handle i2c = I2C_open(I2C_INSTANCE_NUM, &i2cParams);
+     if (i2c == NULL)
+     {
+         return 0;
+     }
 
-    I2C_close(i2c);
-    return rxBuf;
+     uint32_t result = 0;
+     I2C_Transaction   transaction;
+     /* Initialize slave I2C transaction structure */
+     I2C_transactionInit(&transaction);
+     transaction.writeCount = sizeof(address);
+     transaction.readCount  = sizeof(result);
+     transaction.timeout    = 1000;
+     transaction.expandSA = false;
+     transaction.masterMode   = true;
+     transaction.slaveAddress = I2C_SLAVE_ADDR;
+     transaction.writeBuf     = (Ptr)&address;
+     transaction.readBuf      = (Ptr)&result;
+
+     /* Initiate I2C transfer */
+     I2C_transfer(i2c, &transaction);
+
+     I2C_close(i2c);
+     return result;
 }
 
 
@@ -138,12 +151,10 @@ Void masterTaskFxn (UArg arg0, UArg arg1)
 
     int i = 0;
     while (1) {
-        uint8_t address = i % 5;
-        uint32_t value = i % 20;
+        uint8_t address = 1;
         i++;
-        UART_printf("FPGA WriteReg [%u] = [%u]\n", address, value);
-        FPGA_WriteReg(address, value);
-        Task_sleep(1000);
+        int value = FPGA_ReadReg(address);
+        UART_printf("FPGA ReadReg [%u]=[%u],[%02x]\n", address, value, value);
     }
 
 }
