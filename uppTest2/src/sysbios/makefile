@@ -14,7 +14,7 @@ BIOS_DEFS =  -Dti_sysbios_BIOS_swiEnabled__D=TRUE -Dti_sysbios_BIOS_taskEnabled_
 
 BIOS_INC  = -I"D:/ti/bios_6_46_05_55/packages/"
 
-INCS =  $(BIOS_INC) -I"D:/ti/bios_6_46_05_55/packages/" -I"D:/ti/ccsv7/ccs_base/" -I"D:/ti/xdctools_3_32_02_25_core/packages/" -I"../" -I"/packages//" 
+INCS =  $(BIOS_INC) -I"D:/ti/bios_6_46_05_55/packages/" -I"D:/ti/pdk_omapl138_1_0_1/packages/" -I"D:/ti/ccsv7/ccs_base/" -I"D:/ti/xdctools_3_32_02_25_core/packages/" -I"../" -I"/packages//" 
 
 CC = D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.1/bin/cl6x -c $(CCOPTS) -I D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.1/include
 ASM = D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.1/bin/cl6x -c $(CCOPTS) -I D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.1/include

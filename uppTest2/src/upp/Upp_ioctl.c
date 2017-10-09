@@ -220,7 +220,7 @@ Int32 Upp_localSubmitIoctl(Upp_ChanObj  *chanHandle,
                     domain = Power_PER;
                 }
 
-                retVal = (Int32)PWRM_getCurrentSetpoint(domain,&setpoint);
+                retVal = (Int32)Power_getCurrentSetpoint(domain,&setpoint);
 
                 if (Power_SOK == retVal)
                 {
@@ -493,7 +493,7 @@ Int32 Upp_localSubmitIoctl(Upp_ChanObj  *chanHandle,
                         domain = Power_PER;
                     }
 
-                    retVal = (Int32)PWRM_getCurrentSetpoint(domain,&setpoint);
+                    retVal = (Int32)Power_getCurrentSetpoint(domain,&setpoint);
 
                     if (Power_SOK == retVal)
                     {
@@ -602,9 +602,9 @@ Void Upp_localAbortChan(Upp_ChanObj *chanHandle)
     instHandle = (Upp_Object *)chanHandle->devHandle;
     assert(NULL != instHandle);
 
-    while (FALSE == QUE_empty(&chanHandle->queActiveList))
+    while (FALSE == Queue_empty(&chanHandle->queActiveList))
     {
-        ioPacket = QUE_get(&chanHandle->queActiveList);
+        ioPacket = Queue_get(&chanHandle->queActiveList);
 
         if (NULL != ioPacket)
         {
@@ -629,9 +629,9 @@ Void Upp_localAbortChan(Upp_ChanObj *chanHandle)
     }
 
 
-    while (FALSE == QUE_empty(&chanHandle->quePendList))
+    while (FALSE == Queue_empty(&chanHandle->quePendList))
     {
-        ioPacket = QUE_get(&chanHandle->quePendList);
+        ioPacket = Queue_get(&chanHandle->quePendList);
 
         if (NULL != ioPacket)
         {
