@@ -82,7 +82,7 @@ typedef enum LOCAL_mode {
 #define upp_line_offset      (upp_line_size)
 #define upp_clock_div        (7)
 #define upp_demo_mode        (LOCAL_mode_AB_dlb)
-#define NUM_BUF              (10)
+#define NUM_BUF              (1)
 // global variables
 volatile int upp_interrupt_count = 0;
 volatile int upp_error_count = 0;
@@ -167,8 +167,10 @@ static void LOCAL_upp_demo(UArg a0, UArg a1)
         return;
     }
     System_printf("Programming uPP transfers...\n");
-    int j;
-    for (j = 0; j < NUM_BUF; j++) {
+    while (TRUE) {
+        int j = 0;
+        //    int j;
+        //    for (j = 0; j < NUM_BUF; j++) {
         // program transfer(s)
 
         LOCAL_upp_config_xfers(&upp_xfer_a[j], &upp_xfer_b[j], j);
@@ -179,7 +181,7 @@ static void LOCAL_upp_demo(UArg a0, UArg a1)
         case LOCAL_mode_AB_dlb:
             status  = GIO_read(upph, &upp_xfer_b[j], NULL);
             status |= GIO_write(upph, &upp_xfer_a[j], NULL);
-            Task_sleep(1000);
+            //Task_sleep(1000);
             break;
 
         case LOCAL_mode_BA_dlb:
@@ -209,97 +211,99 @@ static void LOCAL_upp_demo(UArg a0, UArg a1)
         }
 
 
+        //    }
+        // wait until transfer(s) complete
+        target_int_count = (upp_mode == LOCAL_mode_AB_dlb  ||
+                upp_mode == LOCAL_mode_BA_dlb) ? 2 * NUM_BUF : 1 * NUM_BUF;
+        while (upp_interrupt_count < target_int_count && upp_error_count == 0)
+            asm(" nop");
+        // check buffers (loopback modes only)
+        if ((target_int_count == (upp_mode == LOCAL_mode_AB_dlb  ||
+                upp_mode == LOCAL_mode_BA_dlb)) && (upp_error_count == 0))
+            for (j = 0; j < NUM_BUF; j++) {
+                for (i = 0; i < sizeof(upp_buffer_a[j]); i++)
+                    if (upp_buffer_a[j][i] != upp_buffer_b[j][i])
+                    {
+                        //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
+                        upp_error_count++;
+                    }
+            }
+
+        // report test result
+        if (upp_error_count)
+            System_printf("uPP transfers completed with %u errors.\n", upp_error_count);
+        else
+            System_printf ("uPP transfers completed! upp_interrupt_count = %u\n", upp_interrupt_count);
+
+        upp_error_count = 0;
+        upp_interrupt_count = 0;
+        Task_sleep(1000);
     }
-    // wait until transfer(s) complete
-    target_int_count = (upp_mode == LOCAL_mode_AB_dlb  ||
-            upp_mode == LOCAL_mode_BA_dlb) ? 2 * NUM_BUF : 1 * NUM_BUF;
-    while (upp_interrupt_count < target_int_count && upp_error_count == 0)
-        asm(" nop");
-    // check buffers (loopback modes only)
-    if ((target_int_count == (upp_mode == LOCAL_mode_AB_dlb  ||
-            upp_mode == LOCAL_mode_BA_dlb)) && (upp_error_count == 0))
-        for (j = 0; j < NUM_BUF; j++) {
-            for (i = 0; i < sizeof(upp_buffer_a[j]); i++)
-                if (upp_buffer_a[j][i] != upp_buffer_b[j][i])
-                {
-                    //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
-                    upp_error_count++;
-                }
-        }
-
-    // report test result
-    if (upp_error_count)
-        System_printf("uPP transfers completed with %u errors.\n", upp_error_count);
-    else
-        System_printf ("uPP transfers completed! upp_interrupt_count = %u\n", upp_interrupt_count);
-
-    upp_error_count = 0;
-    upp_interrupt_count = 0;
-    System_printf("Reprogramming uPP transfers...\n");
-    for (j = 0; j < NUM_BUF; j++) {
-        // program transfer(s)
-
-        LOCAL_upp_config_xfers(&upp_xfer_a[j], &upp_xfer_b[j], j);
-
-        // note: begin read first if in DLB mode
-        switch (upp_mode)
-        {
-        case LOCAL_mode_AB_dlb:
-            status  = GIO_read(upph, &upp_xfer_b[j], NULL);
-            status |= GIO_write(upph, &upp_xfer_a[j], NULL);
-            Task_sleep(1000);
-            break;
-
-        case LOCAL_mode_BA_dlb:
-            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
-            status |= GIO_write(upph, &upp_xfer_b[j], NULL);
-            break;
-
-        case LOCAL_mode_A_transmit:
-            status  = GIO_write(upph, &upp_xfer_a[j], NULL);
-            break;
-
-        case LOCAL_mode_A_receive:
-            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
-            break;
-
-        default:
-            // unrecognized mode (shouldn't happen)
-            status  = -1;
-            break;
-        }
-
-        // catch GIO_submit errors)
-        if (status < 0)
-        {
-            System_printf("Error programming uPP transfers.\n");
-            upp_error_count++;
-        }
-
-
-    }
-    // wait until transfer(s) complete
-    target_int_count = (upp_mode == LOCAL_mode_AB_dlb  ||
-            upp_mode == LOCAL_mode_BA_dlb) ? 2 * NUM_BUF : 1 * NUM_BUF;
-    while (upp_interrupt_count < target_int_count && upp_error_count == 0)
-        asm(" nop");
-    // check buffers (loopback modes only)
-    if ((target_int_count == (upp_mode == LOCAL_mode_AB_dlb  ||
-            upp_mode == LOCAL_mode_BA_dlb)) && (upp_error_count == 0))
-        for (j = 0; j < NUM_BUF; j++) {
-            for (i = 0; i < sizeof(upp_buffer_a[j]); i++)
-                if (upp_buffer_a[j][i] != upp_buffer_b[j][i])
-                {
-                    //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
-                    upp_error_count++;
-                }
-        }
-
-    // report test result
-    if (upp_error_count)
-        System_printf("uPP transfers completed with %u errors.\n", upp_error_count);
-    else
-        System_printf ("uPP transfers completed! upp_interrupt_count = %u\n", upp_interrupt_count);
+//    System_printf("Reprogramming uPP transfers...\n");
+//    for (j = 0; j < NUM_BUF; j++) {
+//        // program transfer(s)
+//
+//        LOCAL_upp_config_xfers(&upp_xfer_a[j], &upp_xfer_b[j], j);
+//
+//        // note: begin read first if in DLB mode
+//        switch (upp_mode)
+//        {
+//        case LOCAL_mode_AB_dlb:
+//            status  = GIO_read(upph, &upp_xfer_b[j], NULL);
+//            status |= GIO_write(upph, &upp_xfer_a[j], NULL);
+//            //Task_sleep(1000);
+//            break;
+//
+//        case LOCAL_mode_BA_dlb:
+//            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
+//            status |= GIO_write(upph, &upp_xfer_b[j], NULL);
+//            break;
+//
+//        case LOCAL_mode_A_transmit:
+//            status  = GIO_write(upph, &upp_xfer_a[j], NULL);
+//            break;
+//
+//        case LOCAL_mode_A_receive:
+//            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
+//            break;
+//
+//        default:
+//            // unrecognized mode (shouldn't happen)
+//            status  = -1;
+//            break;
+//        }
+//
+//        // catch GIO_submit errors)
+//        if (status < 0)
+//        {
+//            System_printf("Error programming uPP transfers.\n");
+//            upp_error_count++;
+//        }
+//
+//
+//    }
+//    // wait until transfer(s) complete
+//    target_int_count = (upp_mode == LOCAL_mode_AB_dlb  ||
+//            upp_mode == LOCAL_mode_BA_dlb) ? 2 * NUM_BUF : 1 * NUM_BUF;
+//    while (upp_interrupt_count < target_int_count && upp_error_count == 0)
+//        asm(" nop");
+//    // check buffers (loopback modes only)
+//    if ((target_int_count == (upp_mode == LOCAL_mode_AB_dlb  ||
+//            upp_mode == LOCAL_mode_BA_dlb)) && (upp_error_count == 0))
+//        for (j = 0; j < NUM_BUF; j++) {
+//            for (i = 0; i < sizeof(upp_buffer_a[j]); i++)
+//                if (upp_buffer_a[j][i] != upp_buffer_b[j][i])
+//                {
+//                    //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
+//                    upp_error_count++;
+//                }
+//        }
+//
+//    // report test result
+//    if (upp_error_count)
+//        System_printf("uPP transfers completed with %u errors.\n", upp_error_count);
+//    else
+//        System_printf ("uPP transfers completed! upp_interrupt_count = %u\n", upp_interrupt_count);
 }
 
 
