@@ -87,14 +87,14 @@ typedef enum LOCAL_mode {
 volatile int upp_interrupt_count = 0;
 volatile int upp_error_count = 0;
 LOCAL_mode upp_mode = upp_demo_mode;
-static upp_Transfer upp_xfer_a[NUM_BUF], upp_xfer_b[NUM_BUF];
-static Uint8 upp_buffer_a[NUM_BUF][upp_line_size * upp_line_count];
-static Uint8 upp_buffer_b[NUM_BUF][upp_line_size * upp_line_count];
+static upp_Transfer upp_xfer_a, upp_xfer_b;
+static Uint8 upp_buffer_a[upp_line_size * upp_line_count];
+static Uint8 upp_buffer_b[upp_line_size * upp_line_count];
 
 // local functions
 static void LOCAL_upp_demo();
 static void LOCAL_upp_config(upp_UserParams *upp_setup);
-static void LOCAL_upp_config_xfers(upp_Transfer *xfer_a, upp_Transfer *xfer_b, int j);
+static void LOCAL_upp_config_xfers(upp_Transfer *xfer_a, upp_Transfer *xfer_b);
 static void LOCAL_upp_complete_cb(upp_Transfer *xfer, Uint32 upp_isr_bit);
 static void LOCAL_upp_error_cb(upp_Transfer *xfer, Uint32 upp_isr_bit);
 static void LOCAL_kick_unlock();
@@ -168,33 +168,32 @@ static void LOCAL_upp_demo(UArg a0, UArg a1)
     }
     System_printf("Programming uPP transfers...\n");
     while (TRUE) {
-        int j = 0;
         //    int j;
         //    for (j = 0; j < NUM_BUF; j++) {
         // program transfer(s)
 
-        LOCAL_upp_config_xfers(&upp_xfer_a[j], &upp_xfer_b[j], j);
+        LOCAL_upp_config_xfers(&upp_xfer_a, &upp_xfer_b);
 
         // note: begin read first if in DLB mode
         switch (upp_mode)
         {
         case LOCAL_mode_AB_dlb:
-            status  = GIO_read(upph, &upp_xfer_b[j], NULL);
-            status |= GIO_write(upph, &upp_xfer_a[j], NULL);
+            status  = GIO_read(upph, &upp_xfer_b, NULL);
+            status |= GIO_write(upph, &upp_xfer_a, NULL);
             //Task_sleep(1000);
             break;
 
         case LOCAL_mode_BA_dlb:
-            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
-            status |= GIO_write(upph, &upp_xfer_b[j], NULL);
+            status  = GIO_read(upph, &upp_xfer_a, NULL);
+            status |= GIO_write(upph, &upp_xfer_b, NULL);
             break;
 
         case LOCAL_mode_A_transmit:
-            status  = GIO_write(upph, &upp_xfer_a[j], NULL);
+            status  = GIO_write(upph, &upp_xfer_a, NULL);
             break;
 
         case LOCAL_mode_A_receive:
-            status  = GIO_read(upph, &upp_xfer_a[j], NULL);
+            status  = GIO_read(upph, &upp_xfer_a, NULL);
             break;
 
         default:
@@ -220,14 +219,12 @@ static void LOCAL_upp_demo(UArg a0, UArg a1)
         // check buffers (loopback modes only)
         if ((target_int_count == (upp_mode == LOCAL_mode_AB_dlb  ||
                 upp_mode == LOCAL_mode_BA_dlb)) && (upp_error_count == 0))
-            for (j = 0; j < NUM_BUF; j++) {
-                for (i = 0; i < sizeof(upp_buffer_a[j]); i++)
-                    if (upp_buffer_a[j][i] != upp_buffer_b[j][i])
-                    {
-                        //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
-                        upp_error_count++;
-                    }
-            }
+            for (i = 0; i < sizeof(upp_buffer_a); i++)
+                if (upp_buffer_a[i] != upp_buffer_b[i])
+                {
+                    //System_printf("Data mismatch in buffers. %x != %x\n", upp_buffer_a[j][i], upp_buffer_b[j][i]);
+                    upp_error_count++;
+                }
 
         // report test result
         if (upp_error_count)
@@ -369,22 +366,22 @@ static void LOCAL_upp_config(upp_UserParams *upp_setup)
 // LOCAL_upp_config_xfers initializes uPP transfers according to parameters
 // defined in local macros
 
-static void LOCAL_upp_config_xfers(upp_Transfer *xfer_a, upp_Transfer *xfer_b, int j)
+static void LOCAL_upp_config_xfers(upp_Transfer *xfer_a, upp_Transfer *xfer_b)
 {
     int i;
     // initialize uPP buffers
-    for (i = 0; i < sizeof(upp_buffer_a[j]) / 4; i++)
+    for (i = 0; i < sizeof(upp_buffer_a) / 4; i++)
     {
         // put data in transmit buffer and clear receive buffer
         if (upp_mode == LOCAL_mode_BA_dlb)
         {
-            ((Uint32 *)upp_buffer_b[j])[i] = 0xAAAA5555;
-            ((Uint32 *)upp_buffer_a[j])[i] = 0xFFFFFFFF;
+            ((Uint32 *)upp_buffer_b)[i] = 0xAAAA5555;
+            ((Uint32 *)upp_buffer_a)[i] = 0xFFFFFFFF;
         }
         else
         {
-            ((Uint32 *)upp_buffer_a[j])[i] = 0xAAAA5555;
-            ((Uint32 *)upp_buffer_b[j])[i] = 0xFFFFFFFF;
+            ((Uint32 *)upp_buffer_a)[i] = 0xAAAA5555;
+            ((Uint32 *)upp_buffer_b)[i] = 0xFFFFFFFF;
         }
     }
     // start with default settings
@@ -392,14 +389,14 @@ static void LOCAL_upp_config_xfers(upp_Transfer *xfer_a, upp_Transfer *xfer_b, i
     *xfer_b =  UPP_TRANSFER;
 
     // apply common settings
-    xfer_a->windowAddr = upp_buffer_a[j];
+    xfer_a->windowAddr = upp_buffer_a;
 
     xfer_a->lineCount = upp_line_count;
     xfer_a->lineSize = upp_line_size;
     xfer_a->lineOffset = upp_line_offset;
     xfer_a->channel = upp_A;
 
-    xfer_b->windowAddr = upp_buffer_b[j];
+    xfer_b->windowAddr = upp_buffer_b;
 
     xfer_b->lineCount = upp_line_count;
     xfer_b->lineSize = upp_line_size;
