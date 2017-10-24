@@ -25,7 +25,7 @@ void lowPrioTaskFxn() {
 
 
 
-//#define LOOP_BACK_MODE
+#define LOOP_BACK_MODE
 
 
 
@@ -62,7 +62,7 @@ void taskSendHandle(UArg a0, UArg a1)
         }
         System_printf("Send: \n");
 
-        for(i = 0; i < UPP_WINDOW_LINE_SIZE; i++)
+        for(i = 0; i < 30; i++)
         {
             System_printf("%02x ", buffer->line[0].data[i]);
         }
@@ -81,7 +81,7 @@ void taskSendHandle(UArg a0, UArg a1)
 
 
 
-        Task_sleep(2000);
+        Task_sleep(1);
     }
 }
 
