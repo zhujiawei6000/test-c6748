@@ -16,13 +16,16 @@
 static Swi_Handle swi0;
 extern IHeap_Handle MyHeap;
 
-void myIdleFunc() {
-    System_flush();
+void lowPrioTaskFxn() {
+    while (TRUE) {
+        System_flush();
+        Task_sleep(1000);
+    }
 }
 
 
 
-#define LOOP_BACK_MODE
+//#define LOOP_BACK_MODE
 
 
 
@@ -102,7 +105,7 @@ static void swiFunc(UArg a0, UArg a1)
         System_printf("Recv[%d]: [%x], Line[%d]\n", currentWindow->windowIndex, currentWindow->windowAddr, j);
         //Check data
         int i;
-        for(i = 0; i < UPP_WINDOW_LINE_SIZE;i++) {
+        for(i = 0; i < 30;i++) {
             System_printf("%02x ", ((WindowBuffer *)currentWindow->windowAddr)->line[j].data[i]);
         }
         System_printf("\n");
