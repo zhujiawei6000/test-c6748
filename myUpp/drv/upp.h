@@ -165,7 +165,7 @@ typedef struct upp_Obj {
 
 #define TRANSFER_LINK_DEPTH     (2)
 
-#define UPP_WINDOW_LINE_SIZE    (7616)
+#define UPP_WINDOW_LINE_SIZE    (7616*2)
 #define UPP_WINDOW_LINE_COUNT   (3)
 
 

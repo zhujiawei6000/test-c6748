@@ -14,7 +14,7 @@ upp_Params UppDefaultConifgs = {
 
     .A = {
         .direction = upp_dir_rcv,
-        .clock_div = 7,
+        .clock_div = 2,
         .data_rate = 1,
         .width = 16,
         .format = upp_format_rjze,
@@ -46,7 +46,7 @@ upp_Params UppDefaultConifgs = {
 
     .B = {
         .direction = upp_dir_rcv,
-        .clock_div = 7,
+        .clock_div = 2,
         .data_rate = 1,
         .width = 16,
         .format = upp_format_rjze,
