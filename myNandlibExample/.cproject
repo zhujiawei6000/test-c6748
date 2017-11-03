@@ -70,6 +70,7 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.C6000_8.2.linkerID.LIBRARY.363749652" name="Include library file or command file as input (--library, -l)" superClass="com.ti.ccstudio.buildDefinitions.C6000_8.2.linkerID.LIBRARY" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="${BIOS_LIBRARIES}"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/myNandlib/Debug/myNandlib.lib}&quot;"/>
 									<listOptionValue builtIn="false" value="libc.a"/>
 								</option>
 								<inputType id="com.ti.ccstudio.buildDefinitions.C6000_8.2.exeLinker.inputType__CMD_SRCS.1475603670" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.C6000_8.2.exeLinker.inputType__CMD_SRCS"/>
