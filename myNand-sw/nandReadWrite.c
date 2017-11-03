@@ -38,7 +38,6 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <ti/drv/uart/UART_stdio.h>
 #include "hw_emifa2.h"
 #include "hw_types.h"
 #include "soc_C6748.h"
@@ -50,7 +49,8 @@
 #include "nandDma.h"
 #include "lcdkC6748.h"
 #include <ti/board/board.h>
-
+#include <xdc/runtime/System.h>
+#include <ti/drv/uart/UART_stdio.h>
 
 /*******************************************************************************
 *                       INTERNAL MACRO DEFINITIONS

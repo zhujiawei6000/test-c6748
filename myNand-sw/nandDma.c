@@ -45,8 +45,8 @@
 #include "soc_OMAPL138.h"
 #include "psc.h"
 //#include "uartStdio.h"
-#include <ti/drv/uart/UART.h>
-#include <ti/drv/uart/UART_stdio.h>
+#include <xdc/runtime/System.h>
+
 
 #include "nandlib.h"
 #include "nandDma.h"
@@ -462,7 +462,7 @@ void EMIFANANDXferSetup(NandInfo_t *nandInfo, unsigned char *data,
 
     if (!retVal)
     {
-        UART_printf ("NAND : EDMA3EnableTransfer Failed.\r\n");
+        System_printf ("NAND : EDMA3EnableTransfer Failed.\r\n");
     }
 }
 
