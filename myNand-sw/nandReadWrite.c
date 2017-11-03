@@ -39,7 +39,9 @@
 *
 */
 #include "hw_emifa2.h"
-#include "hw_types.h"
+#include <ti/drv/uart/UART_stdio.h>
+#include <ti/board/board.h>
+#include <xdc/runtime/System.h>
 #include "soc_C6748.h"
 //#include "uartStdio.h"
 #include "interrupt.h"
@@ -48,9 +50,8 @@
 #include "nand_emifa2.h"
 #include "nandDma.h"
 #include "lcdkC6748.h"
-#include <ti/board/board.h>
-#include <xdc/runtime/System.h>
-#include <ti/drv/uart/UART_stdio.h>
+#include "hw_types.h"
+
 
 /*******************************************************************************
 *                       INTERNAL MACRO DEFINITIONS
