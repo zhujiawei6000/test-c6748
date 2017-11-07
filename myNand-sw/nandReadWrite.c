@@ -39,6 +39,7 @@
 *
 */
 #include "hw_emifa2.h"
+#include <ti/sysbios/BIOS.h>
 #include <ti/drv/uart/UART_stdio.h>
 #include <ti/board/board.h>
 #include <xdc/runtime/System.h>
@@ -375,7 +376,10 @@ static void NANDInfoInit(NandInfo_t *nandInfo, unsigned int cs)
 * \brief  Main Function.\n                                                    *
 *                                                                             *
 ******************************************************************************/
-int main(void)
+int main() {
+    BIOS_start();
+}
+int StackTest(void)
 {
     int blkNum;
     int pageNum;

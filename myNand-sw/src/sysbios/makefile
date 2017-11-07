@@ -16,9 +16,9 @@ BIOS_INC  = -I"D:/ti/bios_6_46_05_55/packages/"
 
 INCS =  $(BIOS_INC) -I"D:/ti/bios_6_46_05_55/packages/" -I"D:/ti/pdk_omapl138_1_0_1_custom/packages/" -I"D:/ti/ccsv7/ccs_base/" -I"D:/ti/xdctools_3_32_02_25_core/packages/" -I"../" -I"/packages//" 
 
-CC = D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.2/bin/cl6x -c $(CCOPTS) -I D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.2/include
-ASM = D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.2/bin/cl6x -c $(CCOPTS) -I D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.2/include
-AR = D:/ti/ccsv7/tools/compiler/ti-cgt-c6000_8.2.2/bin/ar6x rq
+CC = D:/ti/ti-cgt-c6000_8.1.3/bin/cl6x -c $(CCOPTS) -I D:/ti/ti-cgt-c6000_8.1.3/include
+ASM = D:/ti/ti-cgt-c6000_8.1.3/bin/cl6x -c $(CCOPTS) -I D:/ti/ti-cgt-c6000_8.1.3/include
+AR = D:/ti/ti-cgt-c6000_8.1.3/bin/ar6x rq
 
 DEL = D:/ti/xdctools_3_32_02_25_core/packages/../bin/rm -f
 CP = D:/ti/xdctools_3_32_02_25_core/packages/../bin/cp -f

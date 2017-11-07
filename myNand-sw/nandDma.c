@@ -50,6 +50,7 @@
 
 #include "nandlib.h"
 #include "nandDma.h"
+#include <ti/sysbios/family/c64p/EventCombiner.h>
 
 /*******************************************************************************
 *                       INTERNAL MACRO DEFINITIONS
@@ -384,20 +385,27 @@ static void EDMA3INTCConfigure(void)
 {
 #ifdef _TMS320C6X
     /* Initialize the DSP interrupt controller */
-    IntDSPINTCInit();
-    
-    /* Enable interrupts globally */
-    IntGlobalEnable();
-    
-    /* Register completion interrupt */    
-    IntRegister(C674X_MASK_INT4, Edma3CompletionIsr);
-    IntEventMap(C674X_MASK_INT4, SYS_INT_EDMA3_0_CC0_INT1);
-    IntEnable(C674X_MASK_INT4);
-    
-    /* Register Error Interrupt */
-    IntRegister(C674X_MASK_INT5, Edma3CCErrorIsr);
-    IntEventMap(C674X_MASK_INT5, SYS_INT_EDMA3_0_CC0_ERRINT);
-    IntEnable(C674X_MASK_INT5);    
+//    IntDSPINTCInit();
+//
+//    /* Enable interrupts globally */
+//    IntGlobalEnable();
+//
+//    /* Register completion interrupt */
+//    IntRegister(C674X_MASK_INT4, Edma3CompletionIsr);
+//    IntEventMap(C674X_MASK_INT4, SYS_INT_EDMA3_0_CC0_INT1);
+//    IntEnable(C674X_MASK_INT4);
+//
+//    /* Register Error Interrupt */
+//    IntRegister(C674X_MASK_INT5, Edma3CCErrorIsr);
+//    IntEventMap(C674X_MASK_INT5, SYS_INT_EDMA3_0_CC0_ERRINT);
+//    IntEnable(C674X_MASK_INT5);
+
+    EventCombiner_dispatchPlug(SYS_INT_EDMA3_0_CC0_INT1, (EventCombiner_FuncPtr)Edma3CompletionIsr, NULL, TRUE);
+    EventCombiner_enableEvent(SYS_INT_EDMA3_0_CC0_INT1);
+
+    EventCombiner_dispatchPlug(SYS_INT_EDMA3_0_CC0_ERRINT, (EventCombiner_FuncPtr)Edma3CCErrorIsr, NULL, TRUE);
+    EventCombiner_enableEvent(SYS_INT_EDMA3_0_CC0_ERRINT);
+
 #else
     /* Initialize the ARM Interrupt Controller(AINTC) */
     IntAINTCInit();
