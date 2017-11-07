@@ -150,12 +150,15 @@ static void NANDBuffersInit()
     }
 }
 
+int main() {
+    BIOS_start();
+}
 /******************************************************************************
 *                                                                             *
 * \brief  Main Function.\n                                                    *
 *                                                                             *
 ******************************************************************************/
-int main(void)
+int StackTest(void)
 {
     int blkNum;
     int pageNum;
