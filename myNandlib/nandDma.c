@@ -90,7 +90,7 @@ static volatile unsigned int xferCompFlag = 0;
 * \return  None.                                                              *
 *                                                                             *
 ******************************************************************************/
-static void Edma3CCErrorIsr()
+void Edma3CCErrorIsr()
 {
     volatile unsigned int pendingIrqs;
     unsigned int Cnt = 0u;
@@ -185,7 +185,7 @@ static void Edma3CCErrorIsr()
 * \return  None.                                                              *
 *                                                                             *
 ******************************************************************************/
-static void Edma3CompletionIsr(void)
+void Edma3CompletionIsr(void)
 {
     volatile unsigned int pendingIrqs;
     volatile unsigned int isIPR = 0;
@@ -379,48 +379,48 @@ static unsigned int EMIFANANDTxDmaConfig( unsigned int csBaseAddr,
 * \brief  This function configures the INTC to receive EDMA3 interrupts.      *
 *                                                                             *
 ******************************************************************************/
-static void EDMA3INTCConfigure(void)
-{
-#ifdef _TMS320C6X
-    /* Initialize the DSP interrupt controller */
-    IntDSPINTCInit();
-    
-    /* Enable interrupts globally */
-    IntGlobalEnable();
-    
-    /* Register completion interrupt */    
-    IntRegister(C674X_MASK_INT4, Edma3CompletionIsr);
-    IntEventMap(C674X_MASK_INT4, SYS_INT_EDMA3_0_CC0_INT1);
-    IntEnable(C674X_MASK_INT4);
-    
-    /* Register Error Interrupt */
-    IntRegister(C674X_MASK_INT5, Edma3CCErrorIsr);
-    IntEventMap(C674X_MASK_INT5, SYS_INT_EDMA3_0_CC0_ERRINT);
-    IntEnable(C674X_MASK_INT5);    
-#else
-    /* Initialize the ARM Interrupt Controller(AINTC) */
-    IntAINTCInit();
-
-    /* Enable IRQ in CPSR */
-    IntMasterIRQEnable();
-
-    /* Enable the interrupts in GER of AINTC */
-    IntGlobalEnable();
-
-    /* Enable the interrupts in HIER of AINTC */
-    IntIRQEnable();
-    
-    /* Register completion interrupt */
-    IntRegister(SYS_INT_CCINT0, Edma3CompletionIsr);
-    IntChannelSet(SYS_INT_CCINT0, 2);
-    IntSystemEnable(SYS_INT_CCINT0);
-
-    /* Register Error Interrupt */
-    IntRegister(SYS_INT_CCERRINT, Edma3CCErrorIsr);
-    IntChannelSet(SYS_INT_CCERRINT, 2);
-    IntSystemEnable(SYS_INT_CCERRINT);    
-#endif
-}
+//static void EDMA3INTCConfigure(void)
+//{
+//#ifdef _TMS320C6X
+//    /* Initialize the DSP interrupt controller */
+//    IntDSPINTCInit();
+//
+//    /* Enable interrupts globally */
+//    IntGlobalEnable();
+//
+//    /* Register completion interrupt */
+//    IntRegister(C674X_MASK_INT4, Edma3CompletionIsr);
+//    IntEventMap(C674X_MASK_INT4, SYS_INT_EDMA3_0_CC0_INT1);
+//    IntEnable(C674X_MASK_INT4);
+//
+//    /* Register Error Interrupt */
+//    IntRegister(C674X_MASK_INT5, Edma3CCErrorIsr);
+//    IntEventMap(C674X_MASK_INT5, SYS_INT_EDMA3_0_CC0_ERRINT);
+//    IntEnable(C674X_MASK_INT5);
+//#else
+//    /* Initialize the ARM Interrupt Controller(AINTC) */
+//    IntAINTCInit();
+//
+//    /* Enable IRQ in CPSR */
+//    IntMasterIRQEnable();
+//
+//    /* Enable the interrupts in GER of AINTC */
+//    IntGlobalEnable();
+//
+//    /* Enable the interrupts in HIER of AINTC */
+//    IntIRQEnable();
+//
+//    /* Register completion interrupt */
+//    IntRegister(SYS_INT_CCINT0, Edma3CompletionIsr);
+//    IntChannelSet(SYS_INT_CCINT0, 2);
+//    IntSystemEnable(SYS_INT_CCINT0);
+//
+//    /* Register Error Interrupt */
+//    IntRegister(SYS_INT_CCERRINT, Edma3CCErrorIsr);
+//    IntChannelSet(SYS_INT_CCERRINT, 2);
+//    IntSystemEnable(SYS_INT_CCERRINT);
+//#endif
+//}
 
 
 /******************************************************************************

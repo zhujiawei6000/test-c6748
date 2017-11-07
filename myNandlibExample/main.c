@@ -13,10 +13,19 @@
 #include <ti/drv/uart/UART_stdio.h>
 #include <ti/board/board.h>
 #include "nandReadWrite.h"
+#include "interrupt.h"
+#include <ti/sysbios/family/c64p/EventCombiner.h>
+#include "nandDma.h"
 
+extern void EDMA3INTCConfigure(void)
+{
 
+    EventCombiner_dispatchPlug(SYS_INT_EDMA3_0_CC0_INT1, (EventCombiner_FuncPtr)Edma3CompletionIsr, NULL, TRUE);
+    EventCombiner_enableEvent(SYS_INT_EDMA3_0_CC0_INT1);
 
-
+    EventCombiner_dispatchPlug(SYS_INT_EDMA3_0_CC0_ERRINT, (EventCombiner_FuncPtr)Edma3CCErrorIsr, NULL, TRUE);
+    EventCombiner_enableEvent(SYS_INT_EDMA3_0_CC0_ERRINT);
+}
 /*****************************************************************************/
 /*
 ** Macros which defines the data integrity status.
